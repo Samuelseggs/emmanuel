@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devmtn-ui-deployment
+  namespace: dev
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devmtn-ui
+  template:
+    metadata:
+      labels:
+        app: devmtn-ui
+    spec:
+      containers:
+      - name: devmtn-ui
+        image: dockub.coralpay.com/mtn_ui:#{image-tag}#
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu:  "200m"
+          requests:
+            memory: "128Mi"
+            cpu:  "100m"
+        ports:
+        - containerPort: 80
+          protocol: TCP
+      imagePullSecrets:
+        - name: docker-cred
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: devmtn-ui
+  namespace: dev
+spec:
+  type: ClusterIP
+  selector:
+    app: devmtn-ui
+  ports:
+  - port: 8007
+    targetPort: 80
